@@ -20,7 +20,8 @@ for single_file in files:
         # Use 'try-except' to skip files that may be missing data
         try:
             json_file = json.load(f)
-            data.append([
+            temp = []
+            temp.extend([
                 json_file['audio']['fileSize'],
                 json_file['audio']['duration'],
                 json_file['annotations'][0]['audio_id'],
@@ -30,12 +31,24 @@ for single_file in files:
                 json_file['annotations'][0]['categories']['category_02'],
                 json_file['annotations'][0]['categories']['category_03'],
                 json_file['annotations'][0]['note'],
-                json_file['annotations'][0]['audioType'],
-                json_file['annotations'][0]['gender'],
-                json_file['annotations'][0]['generation'],
-                json_file['annotations'][0]['dialect'],
+                json_file['annotations'][0]['audioType']
             ])
-        except KeyError:
+            # Not in '실내' category, occurs key error
+            try:
+                temp.extend([
+                    json_file['annotations'][0]['gender'],
+                    json_file['annotations'][0]['generation'],
+                    json_file['annotations'][0]['dialect']
+                ])
+            # fill with None for exception
+            except KeyError:
+                temp.extend([None, None, None])
+
+            data.append(temp)
+
+        except KeyError as e:
+            print(e)
+            err_cnt += 1
             print(f'Skipping {single_file}')
 
 # Sort the data
