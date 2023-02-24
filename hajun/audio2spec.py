@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 path = '/Users/yoohajun/Desktop/grad_audio'
 
-# Load the audio files
+# 오디오 파일 로드
 def generate_spectrogram(audio_dir, subdir, img_height, img_width):
 
     spec_dir_2 = os.path.join(spec_dir, subdir)
@@ -15,22 +15,22 @@ def generate_spectrogram(audio_dir, subdir, img_height, img_width):
         print(f"{spec_dir_2} : vacant created")
 
 
-    # Loop over all the audio files in the input directory
+    # subdir에 넣어 놓은 오디오 파일 loop
     for idx, filename in enumerate(os.listdir(audio_dir)):
         if filename.endswith('.wav'):
             # Load the audio file
             filepath = os.path.join(audio_dir, filename)
             y, sr = librosa.load(filepath, sr=22050)
 
-            # Generate the spectrogram
+            # 스펙트로그램 생성
             S = librosa.feature.melspectrogram(y=y, sr=sr)
             S_db = librosa.power_to_db(S, ref=np.max)
 
-            # Resize the spectrogram to the fixed shape
+            # Resize spectrogram -> fixed shape
             S_resized = librosa.util.fix_length(S_db, size=img_width, axis=1, mode='constant')
             S_resized = S_resized[:img_height, :]
             print('spectrogram size : ', S_resized.shape)
-            # Save the spectrogram as an image file
+            # Save -> spectrogram to image file
             spec_filename = filename[:-4] + '.png'
             spec_filepath = os.path.join(spec_dir_2, spec_filename)
             plt.imsave(spec_filepath, S_resized)
